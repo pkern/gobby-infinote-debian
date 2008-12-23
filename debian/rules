@@ -1,0 +1,143 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+#export DH_VERBOSE=1
+
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+srcpkg = $(shell dpkg-parsechangelog | sed -ne 's/Source: *//p')
+srcver = $(shell dpkg-parsechangelog | sed -ne 's/Version: *\([0-9]*:\)\?\(.*\)-[^-]*$$/\2/p')
+dbgpkg = $(srcpkg)-dbg
+
+CFLAGS = -g -Wall -Wextra $(if $(findstring noopt,$(DEB_BUILD_OPTIONS)),-O0,-O2)
+LDFLAGS= -Wl,-z,defs
+
+infinote/configure:
+	dh_testdir
+	cd infinote && ./autogen.sh
+
+infinote/config.status: infinote/configure
+	dh_testdir
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub infinote/config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess infinote/config.guess
+endif
+	cd infinote && ./configure --prefix=/usr \
+		--host=$(DEB_HOST_GNU_TYPE) \
+		--build=$(DEB_BUILD_GNU_TYPE) \
+		--mandir=\$${prefix}/share/man \
+		--infodir=\$${prefix}/share/info \
+		CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+
+gobby/configure:
+	dh_testdir
+	cd gobby && ./autogen.sh
+
+INFINOTE_BASE = $(CURDIR)/infinote
+
+infinote-libs: build-infinote
+	PKG_CONFIG_PATH="infinote" pkg-config --libs \
+		libinfgtk-1.0 \
+		libinftextgtk-1.0 \
+		libinftext-1.0 \
+		libinfinity-1.0 \
+		avahi-client \
+		uuid | \
+		sed -e 's/-linf\w\+-1.0//g' > $@
+
+# The order is significant!
+INFINOTE_LIBS = \
+	$(INFINOTE_BASE)/libinfgtk/.libs/libinfgtk-1.0.a \
+	$(INFINOTE_BASE)/libinftextgtk/.libs/libinftextgtk-1.0.a \
+	$(INFINOTE_BASE)/libinftext/.libs/libinftext-1.0.a \
+	$(INFINOTE_BASE)/libinfinity/.libs/libinfinity-1.0.a \
+
+gobby/config.status: gobby/configure infinote-libs
+	dh_testdir
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub infinote/config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess infinote/config.guess
+endif
+	cd gobby && ./configure --prefix=/usr \
+		--host=$(DEB_HOST_GNU_TYPE) \
+		--build=$(DEB_BUILD_GNU_TYPE) \
+		--mandir=\$${prefix}/share/man \
+		--infodir=\$${prefix}/share/info \
+		--with-gnome \
+		--with-gtksourceview2 \
+		CFLAGS="$(CFLAGS)" \
+		CPPFLAGS="-I$(INFINOTE_BASE)" \
+		LDFLAGS="$(LDFLAGS)" \
+		infinote_LIBS="$(INFINOTE_LIBS) \
+			$(shell cat infinote-libs)" \
+		PKG_CONFIG_PATH="../infinote"
+
+build: build-stamp
+
+build-infinote: infinote/config.status
+	dh_testdir
+	cd infinote && $(MAKE)
+	touch build-infinote
+
+build-gobby: gobby/config.status
+	dh_testdir
+	cd gobby && $(MAKE)
+	touch build-gobby
+
+build-stamp: build-infinote build-gobby
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp build-infinote build-gobby
+	[ ! -f infinote/Makefile ] || cd infinote && $(MAKE) distclean
+	[ ! -f gobby/Makefile ] || cd gobby && $(MAKE) distclean
+	rm -rf infinote/config.guess infinote/config.log infinote/config.sub
+	rm -rf gobby/config.guess gobby/config.log gobby/config.sub
+	dh_clean
+
+install-stamp: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	[ ! -d "$(CURDIR)/debian/tmp" ] && mkdir "$(CURDIR)/debian/tmp"
+	cd infinote && $(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+	cd gobby && $(MAKE) install DESTDIR=$(CURDIR)/debian/gobby-infinote
+	# Copy some additional files.
+	gunzip -c "$(CURDIR)/gobby/contrib/artwork/gobby.xpm.gz" \
+	   > "$(CURDIR)/debian/gobby-infinote/usr/share/pixmaps/gobby.xpm"
+	touch install-stamp
+
+install: install-stamp
+
+binary-indep: build install
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_install --sourcedir=debian/tmp
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+	dh_installman
+	dh_link
+	dh_strip --dbg-package=$(dbgpkg)
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install clean
+

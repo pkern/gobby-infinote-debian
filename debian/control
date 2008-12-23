@@ -1,0 +1,62 @@
+Source: gobby-infinote
+Section: net
+Priority: optional
+Maintainer: Philipp Kern <pkern@debian.org>
+Build-Depends: debhelper (>= 5.0.0), autotools-dev, libglib2.0-dev (>> 2.16.0), libxml2-dev, libgnutls-dev (>> 1.7.2), libgsasl7-dev (>> 0.2.21), uuid-dev
+Standards-Version: 3.8.0
+VCS-Git: git://git.debian.org/git/users/pkern/gobby-infinote.git
+VCS-Browser: http://git.debian.org/?p=users/pkern/gobby-infinote.git
+Homepage: http://gobby.0x539.de
+
+Package: gobby-infinote
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, infinoted
+Suggests: avahi-daemon
+Description: collaborative text editor based on infinote
+ Gobby is an editor which allows to edit text documents and source files
+ collaboratively over a network. All users could work on the file
+ simultaneously without the need to lock it. The parts the various users
+ wrote are highlighted in different colours and it supports syntax
+ highlighting of various programming and markup languages.  Mistakes
+ could be undone.
+ .
+ This version of Gobby is co-installable but not backwards-compatible to
+ Gobby 0.3.x and Gobby 0.4.x but is instead based on a new protocol library
+ called infinote which is shipped with this package.
+ .
+ Gobby is portable to both Windows and Unix-like platforms and makes use of
+ the Gtk+ toolkit.
+
+Package: gobby-infinote-dbg
+Section: devel
+Priority: extra
+Architecture: any
+Depends: gobby (= ${binary:Version})
+Description: collaborative text editor based on infinote - debugging symbols
+ Gobby is an editor which allows to edit text documents and source files
+ collaboratively over a network. All users could work on the file
+ simultaneously without the need to lock it. The parts the various users
+ wrote are highlighted in different colours and it supports syntax
+ highlighting of various programming and markup languages.  Mistakes
+ could be undone.
+ .
+ This version of Gobby is co-installable but not backwards-compatible to
+ Gobby 0.3.x and Gobby 0.4.x but is instead based on a new protocol library
+ called infinote which is shipped with this package.
+ .
+ Gobby is portable to both Windows and Unix-like platforms and makes use of
+ the Gtk+ toolkit.
+ .
+ These are the debugging symbols for gobby, needed only if you try to
+ debug it.
+
+Package: infinoted
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: dedicated server for collaborative editing based on infinote
+ infinoted is a dedicated server which allows clients to edit plain text
+ documents and source files collaboratively over a network. Changes
+ to the documents are synchronised instantly to the other clients.
+ .
+ It serves the documents using the same protocol as gobby-infinote.
+

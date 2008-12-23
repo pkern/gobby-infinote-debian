@@ -1,0 +1,6 @@
+gobby-infinote (0.1.0+git-1) experimental; urgency=low
+
+  * Git export of both infinote and gobby-infinote.
+
+ -- Philipp Kern <pkern@debian.org>  Tue, 05 Feb 2008 08:29:14 +0100
+

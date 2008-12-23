@@ -1,0 +1,3 @@
+?package(gobby):needs="X11" section="Applications/Editors"\
+  title="Gobby 0.5 (based on infinote)" longtitle="Collaborative Gtk+ text editor"\
+  command="/usr/bin/gobby" icon="/usr/share/pixmaps/gobby.xpm"
