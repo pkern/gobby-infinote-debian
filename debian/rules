@@ -112,7 +112,7 @@ install-stamp: build-stamp
 	cd gobby && $(MAKE) install DESTDIR=$(CURDIR)/debian/gobby-infinote
 	# Copy some additional files.
 	gunzip -c "$(CURDIR)/gobby/contrib/artwork/gobby.xpm.gz" \
-	   > "$(CURDIR)/debian/gobby-infinote/usr/share/pixmaps/gobby.xpm"
+	   > "$(CURDIR)/debian/gobby-infinote/usr/share/pixmaps/gobby-0.5.xpm"
 	touch install-stamp
 
 install: install-stamp
@@ -133,7 +133,7 @@ binary-arch: build install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_shlibdeps
+	LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):infinote/libinfinity/.libs:infinote/libinftext/.libs:infinote/libinfgtk/.libs:infinote/libinftextgtk/.libs" dh_shlibdeps -- --ignore-missing-info
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
