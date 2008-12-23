@@ -1,6 +1,6 @@
 [submodule "infinote"]
 	path = infinote
-	url = ssh://git.0x539.de/srv/git/infinote.git
+	url = git://github.com/pkern/infinote.git
 [submodule "gobby"]
 	path = gobby
-	url = ssh://git.0x539.de/srv/git/gobby.git
+	url = git://github.com/pkern/gobby.git
