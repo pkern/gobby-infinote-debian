@@ -70,7 +70,7 @@ endif
 		--infodir=\$${prefix}/share/info \
 		--with-gnome \
 		--with-gtksourceview2 \
-		CFLAGS="$(CFLAGS)" \
+		CXXFLAGS="$(CFLAGS)" \
 		CPPFLAGS="-I$(INFINOTE_BASE)" \
 		LDFLAGS="$(LDFLAGS)" \
 		infinote_LIBS="$(INFINOTE_LIBS) \
