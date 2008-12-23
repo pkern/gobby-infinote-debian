@@ -1,4 +1,3 @@
 usr/bin
-usr/lib/infinoted-1.0/note-plugins/*.so
 usr/lib/libinfinity-1.0/method-plugins/*.so
 usr/share/locale
