@@ -31,7 +31,7 @@ Package: gobby-infinote-dbg
 Section: devel
 Priority: extra
 Architecture: any
-Depends: gobby (= ${binary:Version})
+Depends: gobby-infinote (= ${binary:Version})
 Description: collaborative text editor based on infinote - debugging symbols
  Gobby is an editor which allows to edit text documents and source files
  collaboratively over a network. All users could work on the file
